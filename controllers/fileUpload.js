@@ -42,11 +42,11 @@ exports.imageUpload=async (req,res)=>{
     try{
 
         //data fetch
-        const {name,email,tag}=req.body;
-        console.log(name,email,tag);
+        const {name,email,tags}=req.body;
+        console.log(name,email,tags);
 
         const file=req.files.imageFile;
-        console.log(file);
+        console.log("file: ",file);
 
         //Validation
         const supportedTypes=["jpg","jpeg","png"];
@@ -66,7 +66,7 @@ exports.imageUpload=async (req,res)=>{
         //entry save in DB
         const fileData=await File.create({
             name,
-            tag,
+            tags,
             email,
             imageUrl:response.secure_url
         })
@@ -93,8 +93,8 @@ exports.videoUpload=async (req,res)=>{
     try{
 
         //data fetch
-        const {name,email,tag}=req.body;
-        console.log(name,email,tag);
+        const {name,email,tags}=req.body;
+        console.log(name,email,tags);
 
         const file=req.files.videoFile;
         // console.log(file);
@@ -118,7 +118,7 @@ exports.videoUpload=async (req,res)=>{
         // entry save in DB
         const fileData=await File.create({
             name,
-            tag,
+            tags,
             email,
             videoUrl:response.secure_url
         })
