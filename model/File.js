@@ -8,8 +8,11 @@ const fileSchema= new mongoose.Schema({
     imageUrl:{
         type: 'string'
     },
+    videoUrl:{
+        type: 'string'
+    },
     tags:{
-        type: 'array'
+        type: 'string'
     },
     email:{
         type: 'string'

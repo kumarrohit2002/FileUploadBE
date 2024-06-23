@@ -31,11 +31,12 @@ function isFileTypeSupported(fileType,supportedTypes){
     return supportedTypes.includes(fileType);
 }
 
-async function uploadFileToCloudinary(file,folder){
-    const options ={folder};
+async function uploadFileToCloudinary(file,folder,quality=70){
+    const options ={folder,quality};
+    
+    options.resource_type="auto"
     return await cloudinary.uploader.upload(file.tempFilePath,options);
 }
-
 
 exports.imageUpload=async (req,res)=>{
     try{
@@ -59,11 +60,20 @@ exports.imageUpload=async (req,res)=>{
         }
 
         //file forat supported 
-        const response=await uploadFileToCloudinary(file,"fileUploadFolder");
+        const response=await uploadFileToCloudinary(file,"fileUploadFolder",50);
+        console.log("ImgUrl: ",response.secure_url);
 
+        //entry save in DB
+        const fileData=await File.create({
+            name,
+            tag,
+            email,
+            imageUrl:response.secure_url
+        })
 
         res.status(200).json({
             success:true,
+            ImgUrl:response.secure_url,
             message:"file uploaded successfully"
         })
 
@@ -75,6 +85,58 @@ exports.imageUpload=async (req,res)=>{
         res.status(500).json({
             success:false,
             message:"error in imageUpload hendler"
+        })
+    }
+}
+
+exports.videoUpload=async (req,res)=>{
+    try{
+
+        //data fetch
+        const {name,email,tag}=req.body;
+        console.log(name,email,tag);
+
+        const file=req.files.videoFile;
+        // console.log(file);
+
+        //Validation
+        const supportedTypes=["mp4","mov"];
+        const fileType=file.name.split('.')[1].toLowerCase();
+        console.log("FileType: ",fileType);
+
+        if(!isFileTypeSupported(fileType,supportedTypes)){
+            return res.status(400).json({
+                success:false,
+                message:"file formate not supported"
+            })
+        }
+
+        //file format supported  and compress using:quality 40
+        const response=await uploadFileToCloudinary(file,"fileUploadFolder",40);
+        console.log("VideoUrl: ",response.secure_url);
+
+        // entry save in DB
+        const fileData=await File.create({
+            name,
+            tag,
+            email,
+            videoUrl:response.secure_url
+        })
+
+        res.status(200).json({
+            success:true,
+            ImgUrl:response.secure_url,
+            message:"video file uploaded successfully"
+        })
+
+
+
+    }catch(error){
+        console.log("Error in Video Upload hendler");
+        console.log(error);
+        res.status(500).json({
+            success:false,
+            message:"error in Video Upload hendler"
         })
     }
 }
